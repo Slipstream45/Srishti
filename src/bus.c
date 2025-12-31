@@ -4,8 +4,10 @@
 #include "bus.h"
 
 extern uint8_t *rom;
-extern uint8_t *ram;
+extern uint8_t *ram; //RAM is 16bit, need to dumb down addr
 
+
+//rom is uint8_t we're going small to big
 uint8_t bus_read8(uint32_t address){
     address &= 0x00FFFFFF;
     if(address<0x00400000){
@@ -158,8 +160,10 @@ uint8_t bus_read8(uint32_t address){
     }
     if(address>=0x00FF0000 && address<=0x00FFFFFF){
         //68000 RAM
-        uint32_t temp = ram[address & 0xFFFF];
+        //16 lines for RAM here!!
+        uint8_t temp = ram[address&0xFFFF];
         return temp;
+        
     }
     return 0;
 }
@@ -167,9 +171,10 @@ uint8_t bus_read8(uint32_t address){
 uint16_t bus_read16(uint32_t address){
     address &=0x00FFFFFF;
     if(address<0x00400000){
-        uint32_t temp =  (rom[address]<<8) | (rom[address+1]);
+        uint16_t hi = rom[address];
+        uint16_t lo = rom[address+1];
+        uint16_t temp = (hi<<8) | lo;
         return temp;
-    }
     if(address>=0x00400000 && address<=0x007FFFFF){
         //Sega CD and 32X
         return 0;
@@ -316,16 +321,23 @@ uint16_t bus_read16(uint32_t address){
     }
     if(address>=0x00FF0000 && address<=0x00FFFFFF){
         //68000 RAM
-        uint32_t temp = (ram[address]<<8) | (ram[address+1]);
+        //don't fear the reaper
+        uint32_t new_address = address&0xFFFF;
+        uint16_t hi = ram[new_address];
+        uint16_t lo = ram[new_address+1];
+        uint32_t temp = (hi<<8) | lo;
         return temp;
+        
     }
     return 0;
 }
 
-
-
-
-
+void bus_write16(uint32_t address, uint16_t data, uint16_t size){
+}
+void bus_write32(uint32_t address, uint32_t data, uint32_t size){
+}
+void bus_write8(uint32_t address, uint8_t data, uint8_t size){
+}
 
 
 
