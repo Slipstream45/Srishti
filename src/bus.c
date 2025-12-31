@@ -175,6 +175,7 @@ uint16_t bus_read16(uint32_t address){
         uint16_t lo = rom[address+1];
         uint16_t temp = (hi<<8) | lo;
         return temp;
+    }
     if(address>=0x00400000 && address<=0x007FFFFF){
         //Sega CD and 32X
         return 0;
@@ -332,11 +333,50 @@ uint16_t bus_read16(uint32_t address){
     return 0;
 }
 
-void bus_write16(uint32_t address, uint16_t data, uint16_t size){
+void bus_write8(uint32_t address, uint8_t data){
+    //no write in ROM
+    address &= 0x00FFFFFF;
+    if(address<0x00400000){
+        return;
+    }
+    if(address>=0x00FF0000 && address<=0x00FFFFFF){
+        uint32_t new_address = address & 0xFFFF;
+        ram[new_address] = data;
+    }
 }
-void bus_write32(uint32_t address, uint32_t data, uint32_t size){
+void bus_write16(uint32_t address, uint16_t data){
+    address &= 0x00FFFFFF;
+    if(address<0x00400000){
+        return;
+    }
+    if(address>=0x00FF0000 && address<=0x00FFFFFF){
+
+        uint16_t new_address = address & 0xFFFF;
+        ram[new_address] = (data>>8) & 0xFF;
+        ram[new_address+1] = data & 0xFF;
+    }
+    
 }
-void bus_write8(uint32_t address, uint8_t data, uint8_t size){
+uint32_t bus_read32(uint32_t address){
+    uint32_t hi = bus_read16(address);
+    uint32_t lo = bus_read16(address+2);
+    uint32_t data = (hi<<16)|lo;
+    return data;
+    
+}
+void bus_write32(uint32_t address, uint32_t data){
+    address &= 0x00FFFFFF;
+    if(address<0x00400000){
+        return;
+    }
+    if(address>=0x00FF0000 && address<=0x00FFFFFF){
+
+        uint32_t new_address = address & 0xFFFF;
+        ram[new_address] = (data>>24) & 0xFF;
+        ram[new_address+1] = (data>>16) & 0xFF;
+        ram[new_address+2] = (data>>8) & 0xFF;
+        ram[new_address+3] = (data) & 0xFF;
+    }
 }
 
 
