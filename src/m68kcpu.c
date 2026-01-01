@@ -93,3 +93,26 @@ uint32_t ea_calc(M68K *cpu, uint8_t mode, uint32_t reg, uint32_t size){
             if(size==32){
                 return bus_read32(final_address);
             }
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
